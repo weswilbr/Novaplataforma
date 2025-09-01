@@ -397,7 +397,6 @@ const App = {
 
     // --- LÓGICA DE API (CORRIGIDO) ---
     async callGemini(prompt, systemPrompt = "") {
-        // ALTERADO: A chave de API foi removida daqui.
         // Agora, fazemos uma chamada para o nosso próprio backend no endpoint '/api/gemini'.
         const apiUrl = '/api/gemini';
         
@@ -410,7 +409,7 @@ const App = {
         if (!response.ok) {
             const errorBody = await response.json();
             console.error("Erro do nosso servidor:", errorBody);
-            throw new Error(`Servidor respondeu com status: ${response.status}`);
+            throw new Error(`Ocorreu um erro ao chamar a IA. Verifique o console do servidor.`);
         }
         
         const result = await response.json();
@@ -448,7 +447,6 @@ const App = {
         this.elements.contentSections.innerHTML = html;
     },
 
-    // ALTERADO: Função implementada para renderizar as subpáginas de forma dinâmica.
     renderSubPage(pageId) {
         const itemData = Object.values(contentData).flat().find(i => i.id === pageId);
         const title = itemData ? itemData.title : 'Detalhes';
@@ -489,8 +487,6 @@ const App = {
                 </div>
             `;
         }
-        
-        // Adicione aqui outras lógicas para pageId === 'produtos', etc.
         
         this.elements.subpageContent.innerHTML = contentHTML;
         this.switchPage('subpage-container', title);
