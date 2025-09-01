@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plataforma do Bot</title>
+    
+    <!-- Scripts e Fontes Externas -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Seu CSS Personalizado -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-[--background]">
+
+    <!-- Tela de Login -->
+    <div id="login-overlay" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[--background]">
+        <div class="w-full max-w-md">
+            <div class="text-center mb-10">
+                 <div class="inline-flex items-center justify-center w-16 h-16 bg-[--accent] rounded-2xl shadow-lg mb-4">
+                    <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456zM16.898 20.562L16.25 22.5l-.648-1.938a3.375 3.375 0 00-2.672-2.672L11.25 18l1.938-.648a3.375 3.375 0 002.672-2.672L16.25 13.5l.648 1.938a3.375 3.375 0 002.672 2.672L21.75 18l-1.938.648a3.375 3.375 0 00-2.672 2.672z"></path></svg>
+                </div>
+                <h1 class="text-4xl font-bold text-white">Bot Control Platform</h1>
+                <p class="text-lg text-[--text-secondary] mt-2">Acesse com seu perfil</p>
+            </div>
+             <div class="bg-[--sidebar] p-8 rounded-xl border border-[--border]">
+                <form class="space-y-6">
+                    <div>
+                        <label for="login-role" class="text-sm font-medium text-[--text-secondary]">Tipo de Acesso</label>
+                        <select id="login-role" class="mt-1 block w-full bg-[--card] border border-[--border] rounded-md p-3 text-white focus:ring-2 focus:ring-[--accent] appearance-none">
+                            <option value="admin">Administrador</option>
+                            <option value="user">Usuário</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="login-email" class="text-sm font-medium text-[--text-secondary]">Email</label>
+                        <input type="email" id="login-email" value="admin@example.com" class="mt-1 block w-full bg-[--card] border border-[--border] rounded-md p-3 text-white focus:ring-2 focus:ring-[--accent]">
+                    </div>
+                    <div>
+                        <label for="login-password" class="text-sm font-medium text-[--text-secondary]">Senha</label>
+                        <input type="password" id="login-password" value="password" class="mt-1 block w-full bg-[--card] border border-[--border] rounded-md p-3 text-white focus:ring-2 focus:ring-[--accent]">
+                    </div>
+                    <button type="button" id="login-btn" class="w-full bg-[--accent] hover:bg-[--accent-hover] text-white font-bold py-3 px-4 rounded-lg transition-colors !mt-8">Entrar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div id="app-container" class="hidden h-screen w-full flex">
+        <!-- Sidebar de Navegação -->
+        <aside id="sidebar" class="w-64 bg-[--sidebar] flex flex-col justify-between overflow-y-auto p-4 border-r-4 border-[--border] hover:border-[--accent] cursor-pointer transition-all duration-300">
+            <div>
+                <div class="flex items-center space-x-3 mb-10 p-2 sidebar-title-wrapper">
+                    <div class="w-10 h-10 bg-[--accent] rounded-lg flex items-center justify-center shadow-lg flex-shrink-0">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456zM16.898 20.562L16.25 22.5l-.648-1.938a3.375 3.375 0 00-2.672-2.672L11.25 18l1.938-.648a3.375 3.375 0 002.672-2.672L16.25 13.5l.648 1.938a3.375 3.375 0 002.672 2.672L21.75 18l-1.938.648a3.375 3.375 0 00-2.672 2.672z"></path></svg>
+                    </div>
+                    <h1 class="text-xl font-bold text-white sidebar-text">Bot Control</h1>
+                </div>
+                <nav id="sidebar-nav" class="flex flex-col space-y-2">
+                    <a href="#" class="sidebar-link active flex items-center p-3 text-base rounded-lg text-[--text-secondary] hover:bg-[--card] hover:text-white" data-target="dashboard">
+                        <svg class="w-6 h-6 text-[--text-secondary] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"></path></svg>
+                        <span class="ml-3 sidebar-text">Painel de Controle</span>
+                    </a>
+                    <a href="#" class="sidebar-link flex items-center p-3 text-base rounded-lg text-[--text-secondary] hover:bg-[--card] hover:text-white" data-target="chat">
+                        <svg class="w-6 h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" d="M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        <span class="ml-3 sidebar-text">Chat da Equipe</span>
+                    </a>
+                    <a href="#" class="sidebar-link admin-only flex items-center p-3 text-base rounded-lg text-[--text-secondary] hover:bg-[--card] hover:text-white" data-target="comunicacao">
+                         <svg class="w-6 h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" d="M12 20.25c4.97 0 9-3.694 9-8.25s-4.03-8.25-9-8.25S3 7.006 3 11.55c0 2.973 1.5 5.592 3.75 7.036m.75-2.004v.011M11.25 11.25v.011m1.5 0v.011m1.5 0v.011m-4.5 2.25v.012m1.5 0v.012m1.5 0v.012M12 21a.75.75 0 00.75-.75V18a.75.75 0 00-1.5 0v2.25A.75.75 0 0012 21z"></path></svg>
+                        <span class="ml-3 sidebar-text">Comunicação</span>
+                    </a>
+                    <a href="#" class="sidebar-link flex items-center p-3 text-base rounded-lg text-[--text-secondary] hover:bg-[--card] hover:text-white" data-target="conteudo">
+                        <svg class="w-6 h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25H12"></path></svg>
+                        <span class="ml-3 sidebar-text">Conteúdo e Recursos</span>
+                    </a>
+                    <a href="#" class="sidebar-link admin-only flex items-center p-3 text-base rounded-lg text-[--text-secondary] hover:bg-[--card] hover:text-white" data-target="moderacao">
+                        <svg class="w-6 h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"></path></svg>
+                        <span class="ml-3 sidebar-text">Moderação</span>
+                    </a>
+                    <a href="#" class="sidebar-link admin-only flex items-center p-3 text-base rounded-lg text-[--text-secondary] hover:bg-[--card] hover:text-white" data-target="configuracoes">
+                         <svg class="w-6 h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-1.007 1.11-1.226.55-.22 1.156-.22 1.706 0 .55.219 1.02.684 1.11 1.226l.082.498a1.5 1.5 0 001.455.934c.542-.09.997-.56 1.226-1.11.22-.55.22-1.156 0-1.706-.219-.55-.684-1.02-1.226-1.11a3.992 3.992 0 00-3.053 0c-.542.09-.997.56-1.226 1.11-.22.55-.22 1.156 0 1.706.219.55.684 1.02 1.226 1.11.531.093 1.025.523 1.248 1.008l.12.363a1.5 1.5 0 00.416 1.008c.39.458.97.713 1.558.812.542.09.997.56 1.226 1.11.22.55.22 1.156 0 1.706-.219.55-.684-1.02-1.226-1.11a1.5 1.5 0 00-1.558.812c-.223.485-.223 1.033 0 1.518.22.485.6.848 1.06 1.08.542.24 1.007.714 1.226 1.264.22.55.22 1.156 0 1.706-.219.55-.684 1.02-1.226 1.11a3.992 3.992 0 00-3.053 0c-.542-.09-.997-.56-1.226-1.11-.22-.55-.22 1.156 0-1.706.219-.55.684 1.02 1.226-1.11a1.5 1.5 0 001.06-2.563c-.39-.458-.97-.713-1.558-.812a1.5 1.5 0 00-1.455-.934l-.082-.498zM12 15a3 3 0 100-6 3 3 0 000 6z"></path></svg>
+                        <span class="ml-3 sidebar-text">Configurações</span>
+                    </a>
+                </nav>
+            </div>
+            <div>
+                <div class="admin-only">
+                     <button id="restart-btn" class="w-full mb-2 flex items-center p-2 text-sm text-yellow-400 border border-yellow-600 rounded-lg hover:bg-yellow-500 hover:text-gray-900 transition-colors">
+                        <svg class="w-4 h-4 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0011.664 0l3.181-3.183m-11.664 0l3.181-3.183a8.25 8.25 0 00-11.664 0l3.181 3.183"></path></svg>
+                        <span class="sidebar-text">Reiniciar Bot</span>
+                    </button>
+                </div>
+                 <button id="logout-btn" class="w-full flex items-center p-2 text-sm text-red-400 border border-red-600 rounded-lg hover:bg-red-500 hover:text-white transition-colors">
+                    <svg class="w-5 h-5 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9"></path></svg>
+                    <span class="sidebar-text">Sair</span>
+                </button>
+            </div>
+        </aside>
+
+        <!-- Conteúdo Principal -->
+        <main class="flex-1 overflow-y-auto">
+            <div class="p-8">
+                <!-- Header -->
+                <header class="flex justify-between items-center mb-8">
+                    <h2 id="page-title" class="text-3xl font-bold text-white">Painel de Controle</h2>
+                </header>
+
+                <!-- PÁGINA: PAINEL DE CONTROLE -->
+                <div id="dashboard" class="page-content active">
+                    <!-- Visão do Admin -->
+                    <div class="admin-only">
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                            <div class="bg-[--card] p-6 rounded-lg"><h3 class="text-sm font-medium text-[--text-secondary]">Usuários Ativos</h3><p class="text-3xl font-bold text-white mt-2">1,245</p></div>
+                            <div class="bg-[--card] p-6 rounded-lg"><h3 class="text-sm font-medium text-[--text-secondary]">Comandos Hoje</h3><p class="text-3xl font-bold text-white mt-2">873</p></div>
+                            <div class="bg-[--card] p-6 rounded-lg"><h3 class="text-sm font-medium text-[--text-secondary]">Mensagens Enviadas</h3><p class="text-3xl font-bold text-white mt-2">214</p></div>
+                            <div class="bg-[--card] p-6 rounded-lg"><h3 class="text-sm font-medium text-[--text-secondary]">Erros</h3><p class="text-3xl font-bold text-red-500 mt-2">2</p></div>
+                        </div>
+                        <div class="bg-[--card] p-6 rounded-lg">
+                            <h3 class="text-lg font-semibold text-white mb-4">Log de Atividades Recentes</h3>
+                            <div id="log-container" class="space-y-3 text-sm h-96 overflow-y-auto pr-2"></div>
+                        </div>
+                    </div>
+                    <!-- Visão do Usuário -->
+                    <div class="user-only hidden">
+                        <div class="bg-[--card] p-8 rounded-lg text-center flex flex-col items-center">
+                            <div class="w-16 h-16 bg-[--accent] rounded-full flex items-center justify-center mb-4">
+                                 <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z"></path></svg>
+                            </div>
+                            <h3 class="text-2xl font-bold text-white">Bem-vindo(a) à Plataforma de Recursos!</h3>
+                            <p class="text-[--text-secondary] mt-2 max-w-xl mx-auto">Tudo o que você precisa para o seu negócio em um só lugar. Navegue pelas seções de conteúdo para encontrar materiais, vídeos, convites e muito mais.</p>
+                            <button class="mt-6 bg-[--accent] hover:bg-[--accent-hover] text-white font-semibold py-2 px-6 rounded-lg transition-colors" data-trigger-page="conteudo">
+                                Explorar Conteúdos
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PÁGINA: CHAT -->
+                <div id="chat" class="page-content">
+                    <div class="bg-[--card] rounded-lg h-[calc(100vh-10rem)] flex flex-col">
+                        <div class="p-4 border-b border-[--border] flex justify-between items-center">
+                             <h3 class="text-lg font-semibold text-white">Chat da Equipe</h3>
+                             <button id="gemini-summarize-chat-btn" class="bg-[--sidebar] hover:bg-[--hover] text-sm text-white font-semibold py-2 px-4 rounded-lg flex items-center">
+                                 ✨ Resumir Conversa
+                                 <svg id="gemini-chat-spinner" class="animate-spin ml-2 h-4 w-4 text-white hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                             </button>
+                        </div>
+                        <div id="chat-messages" class="flex-1 p-6 space-y-4 overflow-y-auto">
+                            <!-- Mensagens do Chat -->
+                        </div>
+                        <div class="p-4 border-t border-[--border]">
+                            <form id="chat-form" class="flex items-center space-x-3">
+                                <input type="text" id="chat-input" class="flex-1 bg-[--sidebar] border border-[--border] rounded-lg p-3 text-white focus:ring-2 focus:ring-[--accent]" placeholder="Digite sua mensagem...">
+                                <button type="submit" class="bg-[--accent] hover:bg-[--accent-hover] text-white font-semibold p-3 rounded-lg">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5"></path></svg>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PÁGINA: COMUNICAÇÃO (Admin Only) -->
+                <div id="comunicacao" class="page-content">
+                    <div class="bg-[--card] rounded-lg p-6 max-w-3xl mx-auto">
+                        <div class="bg-[--sidebar] p-4 rounded-lg border border-[--border] mb-6">
+                            <label for="gemini-prompt-comms" class="block text-sm font-medium text-[--text-primary] mb-2">✨ Gerador de Anúncios com IA</label>
+                            <p class="text-xs text-[--text-secondary] mb-2">Digite palavras-chave (ex: "reunião zoom terça 20h, novo produto") e a IA criará o anúncio.</p>
+                            <div class="flex items-center space-x-2">
+                                <input type="text" id="gemini-prompt-comms" class="flex-1 bg-[--card] border border-[--border] rounded-lg p-2 text-white focus:ring-2 focus:ring-[--accent]" placeholder="Palavras-chave...">
+                                <button type="button" id="gemini-generate-comms-btn" class="bg-[--accent] hover:bg-[--accent-hover] text-white font-semibold py-2 px-4 rounded-lg flex items-center justify-center">
+                                    <span id="gemini-comms-btn-text">Gerar</span>
+                                    <svg id="gemini-comms-spinner" class="animate-spin h-5 w-5 text-white hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="relative w-full text-center my-4">
+                            <div class="absolute inset-0 flex items-center" aria-hidden="true"><div class="w-full border-t border-[--border]"></div></div>
+                            <div class="relative flex justify-center"><span class="bg-[--card] px-2 text-sm text-[--text-secondary]">OU</span></div>
+                        </div>
+                         <form id="comms-form">
+                            <label for="channel-message" class="block text-sm font-medium text-[--text-primary] mb-2">Escreva sua mensagem manualmente</label>
+                            <textarea id="channel-message" rows="8" class="w-full bg-[--sidebar] border border-[--border] rounded-lg p-3 focus:ring-2 focus:ring-[--accent] text-white" placeholder="Digite sua mensagem aqui..."></textarea>
+                            <div class="flex justify-end mt-4">
+                                <button type="submit" class="bg-[--accent] hover:bg-[--accent-hover] text-white font-semibold py-2 px-5 rounded-lg">Enviar Mensagem</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- PÁGINA: CONTEÚDO E RECURSOS -->
+                <div id="conteudo" class="page-content">
+                    <div id="content-sections"></div>
+                </div>
+                
+                <!-- SUB-PÁGINAS DE CONTEÚDO (Produtos, Apresentação, etc.) -->
+                <div id="subpage-container" class="page-content">
+                     <button class="back-to-content mb-8 text-sm text-[--accent] hover:text-white flex items-center">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"></path></svg>
+                        Voltar para todos os recursos
+                    </button>
+                    <div id="subpage-content"></div>
+                </div>
+
+                <!-- PÁGINA: MODERAÇÃO (Admin Only) -->
+                <div id="moderacao" class="page-content">
+                    <div class="space-y-8">
+                        <div class="bg-[--card] rounded-lg p-6">
+                             <h3 class="text-lg font-semibold text-white mb-2">Fluxo de Boas-Vindas e Verificação</h3>
+                             <p class="text-sm text-[--text-secondary] mb-4">Gerencia a entrada de novos membros, silenciando-os até que cliquem no botão de verificação.</p>
+                             <div class="flex items-center justify-between bg-[--sidebar] p-4 rounded-lg">
+                                <div>
+                                    <p class="text-white font-medium">Status da Automação</p>
+                                    <p class="text-xs text-[--text-secondary]">Ativada para o canal de verificação.</p>
+                                </div>
+                                <div class="w-12 h-6 flex items-center bg-green-500 rounded-full p-1"><div class="bg-white w-4 h-4 rounded-full shadow-md transform translate-x-6"></div></div>
+                             </div>
+                        </div>
+                         <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <div class="bg-[--card] rounded-lg p-6">
+                                 <h3 class="text-lg font-semibold text-white mb-4">Banir Usuário</h3>
+                                 <form>
+                                    <input type="text" class="w-full bg-[--sidebar] border border-[--border] rounded-lg p-3 text-white" placeholder="ID ou @username do usuário">
+                                    <input type="text" class="w-full mt-3 bg-[--sidebar] border border-[--border] rounded-lg p-3 text-white" placeholder="Motivo (opcional)">
+                                    <button type="submit" class="w-full mt-4 bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-5 rounded-lg">Banir Permanentemente</button>
+                                 </form>
+                            </div>
+                             <div class="bg-[--card] rounded-lg p-6">
+                                 <h3 class="text-lg font-semibold text-white mb-4">Silenciar Usuário</h3>
+                                 <form>
+                                    <input type="text" class="w-full bg-[--sidebar] border border-[--border] rounded-lg p-3 text-white" placeholder="ID ou @username do usuário">
+                                    <input type="text" class="w-full mt-3 bg-[--sidebar] border border-[--border] rounded-lg p-3 text-white" placeholder="Duração (ex: 2h, 1d, 30m)">
+                                    <button type="submit" class="w-full mt-4 bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-2 px-5 rounded-lg">Silenciar Temporariamente</button>
+                                 </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- PÁGINA: CONFIGURAÇÕES (Admin Only) -->
+                <div id="configuracoes" class="page-content">
+                    <div class="bg-[--card] rounded-lg p-6 max-w-3xl mx-auto divide-y divide-[--border]">
+                        <div class="py-4"><p class="text-[--text-secondary]">Bot Token: <span class="font-mono text-[--accent] select-all">BOT_TOKEN</span> <span class="text-xs ml-2">(Carregado do .env)</span></p></div>
+                        <div class="py-4"><p class="text-[--text-secondary]">ID do Canal de Verificação: <span class="font-mono text-[--accent] select-all">CANAL_ID_2</span></p></div>
+                        <div class="py-4"><p class="text-[--text-secondary]">IDs de Administradores: <span class="font-mono text-[--accent] select-all">ADMIN_USER_IDS</span></p></div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal Genérico -->
+    <div class="modal-backdrop" id="details-modal-backdrop"></div>
+    <div class="modal w-11/12 max-w-2xl bg-[--card] rounded-lg shadow-xl p-6" id="details-modal">
+        <div class="flex justify-between items-center mb-4 pb-4 border-b border-[--border]">
+            <h3 id="details-modal-title" class="text-xl font-semibold text-white"></h3>
+            <button id="details-modal-close" class="text-[--text-secondary] hover:text-white">&times;</button>
+        </div>
+        <div id="details-modal-content" class="text-[--text-secondary] whitespace-pre-wrap bg-[--background] p-4 rounded-md max-h-80 overflow-y-auto"></div>
+        <div id="details-modal-actions" class="flex justify-end mt-6"></div>
+    </div>
+
+    <!-- Seus Scripts -->
+    <script src="data.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
