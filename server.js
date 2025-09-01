@@ -1,4 +1,6 @@
-// server.js (VERSÃO CORRIGIDA PARA VERCEL)
+// server.js (VERSÃO DE TESTE PARA FORÇAR ATUALIZAÇÃO)
+console.log("--- EXECUTANDO A VERSÃO MAIS RECENTE DO SERVER.JS ---"); // <-- ESTA É A LINHA DE TESTE
+
 require('dotenv').config();
 const express = require('express');
 const path = require('path');
@@ -44,17 +46,5 @@ app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-
-// =========================================================
-//            ↓ ↓ ↓ ALTERAÇÃO CRÍTICA ABAIXO ↓ ↓ ↓
-// =========================================================
-
-// REMOVA OU COMENTE O app.listen
-/*
-app.listen(port, () => {
-    console.log(`Servidor rodando na porta ${port}`);
-});
-*/
-
-// ADICIONE ESTA LINHA PARA EXPORTAR O APP PARA O VERCEL
+// EXPORTA O APP PARA O VERCEL
 module.exports = app;
