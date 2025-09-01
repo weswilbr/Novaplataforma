@@ -1,24 +1,22 @@
 // server.js
 require('dotenv').config();
 const express = require('express');
+const path = require('path');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 3000;
 
-// Middleware para permitir que o servidor entenda JSON
+// Middleware para entender JSON e servir arquivos estáticos DA RAIZ
 app.use(express.json());
+app.use(express.static(__dirname)); // <-- MUDANÇA IMPORTANTE AQUI
 
-// Servir os arquivos estáticos (HTML, CSS, JS do front-end)
-app.use(express.static('public')); // Assumindo que seus arquivos (index.html, etc) estão numa pasta 'public'
-
-// Inicializa o cliente da API do Gemini com a chave do arquivo .env
+// Inicializa o cliente da API do Gemini com a chave das variáveis de ambiente
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
-// O endpoint que o seu front-end vai chamar
+// Endpoint que o front-end vai chamar
 app.post('/api/gemini', async (req, res) => {
     try {
-        // Pega o prompt do corpo da requisição enviada pelo front-end
         const { prompt, systemPrompt } = req.body;
 
         if (!prompt) {
@@ -34,7 +32,6 @@ app.post('/api/gemini', async (req, res) => {
         const response = await result.response;
         const text = response.text();
 
-        // Envia o texto gerado de volta para o front-end
         res.json({ text });
 
     } catch (error) {
@@ -43,6 +40,11 @@ app.post('/api/gemini', async (req, res) => {
     }
 });
 
+// Rota fallback para servir o index.html
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'index.html'));
+});
+
 app.listen(port, () => {
-    console.log(`Servidor rodando em http://localhost:${port}`);
+    console.log(`Servidor rodando na porta ${port}`);
 });
