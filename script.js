@@ -22,6 +22,7 @@ const App = {
             loginEmailInput: document.getElementById('login-email'),
             loginPasswordInput: document.getElementById('login-password'),
             logoutButton: document.getElementById('logout-btn'),
+            restartButton: document.getElementById('restart-btn'),
             
             sidebar: document.getElementById('sidebar'),
             sidebarLinks: document.querySelectorAll('.sidebar-link'),
@@ -58,6 +59,7 @@ const App = {
     bindEvents() {
         this.elements.loginButton.addEventListener('click', () => this.handleLogin());
         this.elements.logoutButton.addEventListener('click', () => this.handleLogout());
+        this.elements.restartButton.addEventListener('click', () => this.addLog('CMD', 'Comando para reiniciar o bot enviado.'));
         this.elements.loginRoleSelect.addEventListener('change', (e) => this.updateLoginEmail(e.target.value));
         this.elements.sidebar.addEventListener('click', (e) => this.handleSidebarToggle(e));
         
@@ -75,7 +77,6 @@ const App = {
         this.elements.contentSections.addEventListener('click', (e) => this.handleContentClick(e));
         this.elements.backToContentButton.addEventListener('click', () => this.switchPage('conteudo', 'Conteúdo e Recursos'));
         
-        // Delegação de Eventos para conteúdo dinâmico
         this.elements.subpageContent.addEventListener('click', (e) => this.handleSubpageEvents(e));
 
         this.elements.chatForm.addEventListener('submit', (e) => this.handleChatSubmit(e));
@@ -194,7 +195,6 @@ const App = {
         this.addChatMessage(senderName, text, currentRole, true);
         this.elements.chatInput.value = '';
 
-        // Simular resposta
         setTimeout(() => {
             const [replySender, replyText, replyRole] = currentRole === 'admin' 
                 ? ['Usuário', 'Ok, entendido!', 'user'] 
@@ -204,16 +204,16 @@ const App = {
     },
     
     async handleApiCall(button, prompt, systemPrompt, successLog, errorLog, resultHandler) {
-        this.toggleLoadingState(button, true, 'Gerar');
+        this.toggleLoadingState(button, true);
         try {
             const generatedText = await this.callGemini(prompt, systemPrompt);
             resultHandler(generatedText);
             this.addLog('SUCCESS', successLog);
         } catch (error) {
             this.addLog('ERROR', `${errorLog}: ${error.message}`);
-            resultHandler("Ocorreu um erro. Por favor, tente novamente.");
+            resultHandler("Ocorreu um erro ao chamar a IA. Verifique o console do servidor.");
         } finally {
-            this.toggleLoadingState(button, false, 'Gerar');
+            this.toggleLoadingState(button, false);
         }
     },
 
@@ -295,7 +295,7 @@ const App = {
             textToCopy = convitesData[button.dataset.key].text;
         }
         
-        this.copyToClipboard(textToCopy, button, 'Copiado!', button.textContent);
+        this.copyToClipboard(textToCopy, button, 'Copiado!', button.textContent.trim());
     },
     
     handleViewInvite(key) {
@@ -359,17 +359,16 @@ const App = {
     toggleLoadingState(button, isLoading) {
         const spinner = button.querySelector('svg');
         const btnTextEl = button.querySelector('span');
-        const originalText = btnTextEl ? btnTextEl.textContent : '';
 
         button.disabled = isLoading;
         if (spinner) spinner.classList.toggle('hidden', !isLoading);
 
-        if (isLoading) {
-            button.dataset.originalText = originalText;
-            if (btnTextEl) btnTextEl.textContent = 'Gerando...';
-        } else {
-            if (btnTextEl && button.dataset.originalText) {
-                btnTextEl.textContent = button.dataset.originalText;
+        if (btnTextEl) {
+            if (isLoading) {
+                button.dataset.originalText = btnTextEl.textContent;
+                btnTextEl.textContent = 'Gerando...';
+            } else {
+                btnTextEl.textContent = button.dataset.originalText || 'Gerar';
             }
         }
     },
@@ -396,33 +395,26 @@ const App = {
         this.elements.modal.style.display = 'none';
     },
 
-    // --- LÓGICA DE API ---
+    // --- LÓGICA DE API (CORRIGIDO) ---
     async callGemini(prompt, systemPrompt = "") {
-        const apiKey = AIzaSyBzouuoBsoLZVTHHvOzcBXNZ7haOKsKJQc; // Chave de API é tratada pelo ambiente
-        const model = "gemini-1.5-flash-preview-0514";
-        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
-        const payload = { contents: [{ parts: [{ text: prompt }] }] };
-        if (systemPrompt) {
-            payload.systemInstruction = { parts: [{ text: systemPrompt }] };
-        }
+        // ALTERADO: A chave de API foi removida daqui.
+        // Agora, fazemos uma chamada para o nosso próprio backend no endpoint '/api/gemini'.
+        const apiUrl = '/api/gemini';
         
         const response = await fetch(apiUrl, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
+            body: JSON.stringify({ prompt, systemPrompt }) // Enviamos o prompt no corpo da requisição
         });
 
         if (!response.ok) {
             const errorBody = await response.json();
-            console.error("Gemini API Error:", errorBody);
-            throw new Error(`API respondeu com o status: ${response.status}`);
+            console.error("Erro do nosso servidor:", errorBody);
+            throw new Error(`Servidor respondeu com status: ${response.status}`);
         }
+        
         const result = await response.json();
-        const candidate = result.candidates?.[0];
-        if (candidate && candidate.content?.parts?.[0]?.text) {
-            return candidate.content.parts[0].text;
-        }
-        throw new Error("Não foi possível extrair o texto da resposta da IA.");
+        return result.text; // O backend retornará um JSON com a propriedade "text"
     },
 
     // --- FUNÇÕES DE TEMPLATE HTML ---
@@ -456,15 +448,49 @@ const App = {
         this.elements.contentSections.innerHTML = html;
     },
 
+    // ALTERADO: Função implementada para renderizar as subpáginas de forma dinâmica.
     renderSubPage(pageId) {
         const itemData = Object.values(contentData).flat().find(i => i.id === pageId);
         const title = itemData ? itemData.title : 'Detalhes';
-        let contentHTML = `<div class="bg-[--card] rounded-lg p-6">Conteúdo para ${title}...</div>`; // Padrão
+        let contentHTML = `<div class="bg-[--card] rounded-lg p-6">Conteúdo para ${title} não encontrado.</div>`;
 
-        // Adicione aqui as lógicas específicas para cada sub-página, como antes
-        if (pageId === 'produtos') { /* ...código para produtos... */ }
-        if (pageId === 'convites') { /* ...código para convites... */ }
-        // ...etc
+        if (pageId === 'convites') {
+            const invitesHTML = Object.entries(convitesData).map(([key, convite]) => `
+                <div class="flex items-center justify-between p-4 bg-[--sidebar] rounded-lg">
+                    <p class="text-white">${convite.title}</p>
+                    <div class="flex space-x-2">
+                        <button class="text-sm bg-[--card] hover:bg-[--hover] p-2 rounded-md transition-colors" data-action="view-invite" data-key="${key}">Visualizar</button>
+                        <button class="text-sm bg-[--accent] hover:bg-[--accent-hover] p-2 rounded-md transition-colors text-white" data-action="copy-invite" data-key="${key}">Copiar</button>
+                    </div>
+                </div>
+            `).join('');
+            
+            contentHTML = `
+                <div class="bg-[--card] rounded-lg p-6">
+                    <h3 class="text-xl font-semibold text-white mb-6">Modelos de Convite Prontos</h3>
+                    <div class="space-y-4 mb-8">${invitesHTML}</div>
+                    
+                    <div class="border-t border-[--border] pt-6">
+                        <h3 class="text-xl font-semibold text-white mb-2">✨ Gerar Convite com IA</h3>
+                        <p class="text-sm text-[--text-secondary] mb-4">Descreva o perfil da pessoa que você quer convidar e a IA criará uma mensagem personalizada.</p>
+                        <textarea id="gemini-prompt-invite" rows="3" class="w-full bg-[--sidebar] border border-[--border] rounded-lg p-3 text-white focus:ring-2 focus:ring-[--accent]" placeholder="Ex: 'jovem empreendedor que gosta de desafios e busca crescimento financeiro'"></textarea>
+                        <button class="w-full mt-3 bg-[--accent] hover:bg-[--accent-hover] text-white font-semibold py-2 px-5 rounded-lg flex items-center justify-center" data-action="gemini-generate-invite">
+                            <span>Gerar Convite</span>
+                            <svg class="animate-spin ml-2 h-5 w-5 text-white hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                        </button>
+                        <div id="gemini-invite-result-container" class="mt-4 hidden">
+                            <h4 class="text-lg font-semibold text-white mb-2">Resultado Gerado:</h4>
+                            <div class="bg-[--sidebar] p-4 rounded-lg relative">
+                                <p id="gemini-invite-result" class="text-white whitespace-pre-wrap"></p>
+                                <button class="absolute top-2 right-2 text-sm bg-[--card] hover:bg-[--hover] p-2 rounded-md transition-colors" data-action="copy-gemini-invite">Copiar</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        // Adicione aqui outras lógicas para pageId === 'produtos', etc.
         
         this.elements.subpageContent.innerHTML = contentHTML;
         this.switchPage('subpage-container', title);
@@ -493,5 +519,4 @@ const App = {
     },
 };
 
-// Inicia a aplicação quando o DOM estiver pronto
 document.addEventListener('DOMContentLoaded', () => App.init());
