@@ -1,15 +1,14 @@
-// server.js
+// server.js (VERSÃO CORRIGIDA PARA VERCEL)
 require('dotenv').config();
 const express = require('express');
 const path = require('path');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 
 const app = express();
-const port = process.env.PORT || 3000;
 
 // Middleware para entender JSON e servir arquivos estáticos DA RAIZ
 app.use(express.json());
-app.use(express.static(__dirname)); // <-- MUDANÇA IMPORTANTE AQUI
+app.use(express.static(__dirname));
 
 // Inicializa o cliente da API do Gemini com a chave das variáveis de ambiente
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
@@ -45,6 +44,17 @@ app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });
 
+
+// =========================================================
+//            ↓ ↓ ↓ ALTERAÇÃO CRÍTICA ABAIXO ↓ ↓ ↓
+// =========================================================
+
+// REMOVA OU COMENTE O app.listen
+/*
 app.listen(port, () => {
     console.log(`Servidor rodando na porta ${port}`);
 });
+*/
+
+// ADICIONE ESTA LINHA PARA EXPORTAR O APP PARA O VERCEL
+module.exports = app;
