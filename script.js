@@ -398,7 +398,7 @@ const App = {
 
     // --- LÓGICA DE API ---
     async callGemini(prompt, systemPrompt = "") {
-        const apiKey = "AIzaSyBzouuoBsoLZVTHHvOzcBXNZ7haOKsKJQc"; // Chave de API é tratada pelo ambiente
+        const apiKey = AIzaSyBzouuoBsoLZVTHHvOzcBXNZ7haOKsKJQc; // Chave de API é tratada pelo ambiente
         const model = "gemini-1.5-flash-preview-0514";
         const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
         const payload = { contents: [{ parts: [{ text: prompt }] }] };
