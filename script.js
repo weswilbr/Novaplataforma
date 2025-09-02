@@ -207,7 +207,7 @@ const App = {
                 this.addLog('ERROR', `Falha ao obter resposta da IA: ${err.message}`);
                 this.addChatMessage('Sistema', '⚠️ Erro ao chamar a IA.', 'admin', false);
             });
-    }
+    }, // <--- CORREÇÃO: Vírgula adicionada aqui para separar os métodos do objeto.
     
     async handleApiCall(button, prompt, systemPrompt, successLog, errorLog, resultHandler) {
         this.toggleLoadingState(button, true);
