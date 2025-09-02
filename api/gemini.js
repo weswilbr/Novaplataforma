@@ -5,7 +5,7 @@ export default async function handler(req, res) {
   const apiKey = process.env.GEMINI_API_KEY;
 
   // Nosso diagnóstico para ter certeza de que a chave está sendo lida
-  console.log("Verificando a chave de API no servidor. Primeiros 5 caracteres:", apiKey ? apiKey.substring(0, 5) : "CHAVE NÃO ENCONTRADA (UNDEFINED)");
+  console.log("Executando a versão com FETCH. Primeiros 5 caracteres da chave:", apiKey ? apiKey.substring(0, 5) : "CHAVE NÃO ENCONTRADA (UNDEFINED)");
 
   if (!apiKey) {
     // Se a chave não for encontrada, retorna um erro claro
@@ -27,12 +27,11 @@ export default async function handler(req, res) {
     // Monta a URL da API, passando a chave como um parâmetro de busca
     const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`;
 
-    // Monta o corpo (payload) da requisição, exatamente como no exemplo do curl
+    // Monta o corpo (payload) da requisição
     const payload = {
       contents: [{
         parts: [{ text: prompt }]
       }],
-      // Adicionamos a instrução de sistema se ela existir
       ...(systemPrompt && { systemInstruction: { parts: [{ text: systemPrompt }] } })
     };
 
@@ -51,7 +50,8 @@ export default async function handler(req, res) {
     // Se a resposta da API do Google for um erro, nós o registramos e o retornamos
     if (!response.ok || data.error) {
       console.error("Erro recebido da API do Google:", data.error);
-      return res.status(data.error.code || 500).json({ error: `Erro da API do Google: ${data.error.message}` });
+      const errorMessage = data.error?.message || "Erro desconhecido da API do Google.";
+      return res.status(data.error?.code || 500).json({ error: `Erro da API do Google: ${errorMessage}` });
     }
 
     // Extrai o texto da resposta bem-sucedida
