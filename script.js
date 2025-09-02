@@ -188,20 +188,26 @@ const App = {
         event.preventDefault();
         const text = this.elements.chatInput.value.trim();
         if (!text) return;
-
+    
         const currentRole = this.elements.body.classList.contains('role-admin') ? 'admin' : 'user';
         const senderName = currentRole === 'admin' ? 'Admin' : 'Usuário';
-
+    
+        // Mostra mensagem enviada
         this.addChatMessage(senderName, text, currentRole, true);
         this.elements.chatInput.value = '';
-
-        setTimeout(() => {
-            const [replySender, replyText, replyRole] = currentRole === 'admin' 
-                ? ['Usuário', 'Ok, entendido!', 'user'] 
-                : ['Admin', 'Obrigado pelo seu feedback!', 'admin'];
-            this.addChatMessage(replySender, replyText, replyRole, false);
-        }, 1500);
-    },
+    
+        // Chama Gemini pela API
+        this.callGemini(text)
+            .then(replyText => {
+                const replySender = currentRole === 'admin' ? 'Usuário' : 'Admin';
+                const replyRole = currentRole === 'admin' ? 'user' : 'admin';
+                this.addChatMessage(replySender, replyText, replyRole, false);
+            })
+            .catch(err => {
+                this.addLog('ERROR', `Falha ao obter resposta da IA: ${err.message}`);
+                this.addChatMessage('Sistema', '⚠️ Erro ao chamar a IA.', 'admin', false);
+            });
+    }
     
     async handleApiCall(button, prompt, systemPrompt, successLog, errorLog, resultHandler) {
         this.toggleLoadingState(button, true);
