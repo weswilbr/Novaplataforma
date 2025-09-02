@@ -16,10 +16,13 @@ export default async function handler(req, res) {
 
     const model = genAI.getGenerativeModel({
       model: "gemini-1.5-flash-latest",
-      systemInstruction: systemPrompt || "Você é um assistente útil.",
     });
 
-    const result = await model.generateContent(prompt);
+    const result = await model.generateContent([
+      { role: "system", parts: [{ text: systemPrompt || "Você é um assistente útil." }] },
+      { role: "user", parts: [{ text: prompt }] },
+    ]);
+
     const text = result.response.text();
 
     res.status(200).json({ text });
