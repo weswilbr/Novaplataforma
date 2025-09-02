@@ -1,3 +1,4 @@
+#
 // script.js
 
 const App = {
