@@ -2,10 +2,15 @@
   "name": "novaplataforma-bot",
   "version": "1.0.0",
   "description": "Plataforma de controle para Bot com IA Gemini",
+  "main": "script.js",
   "scripts": {
+    "build": "esbuild script.js --bundle --outfile=public/bundle.js --target=es2015",
     "dev": "vercel dev"
   },
   "dependencies": {
     "@google/generative-ai": "^0.15.0"
+  },
+  "devDependencies": {
+    "esbuild": "^0.20.0"
   }
 }
