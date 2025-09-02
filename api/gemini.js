@@ -1,6 +1,9 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
 export default async function handler(req, res) {
+  // LINHA DE DIAGNÓSTICO ADICIONADA:
+  console.log("Verificando a chave de API no servidor. Primeiros 5 caracteres:", process.env.GEMINI_API_KEY ? process.env.GEMINI_API_KEY.substring(0, 5) : "CHAVE NÃO ENCONTRADA (UNDEFINED)");
+
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Método não permitido" });
   }
@@ -12,17 +15,15 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: "O prompt é obrigatório." });
     }
 
+    // O resto do seu código continua igual...
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
     const model = genAI.getGenerativeModel({
       model: "gemini-1.5-flash-latest",
+      systemInstruction: systemPrompt || "Você é um assistente útil.",
     });
 
-    const result = await model.generateContent([
-      { role: "system", parts: [{ text: systemPrompt || "Você é um assistente útil." }] },
-      { role: "user", parts: [{ text: prompt }] },
-    ]);
-
+    const result = await model.generateContent(prompt);
     const text = result.response.text();
 
     res.status(200).json({ text });
